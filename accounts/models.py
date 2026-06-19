@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 from PIL import Image
+from uuid import uuid4
 
 from course.models import Program
 from .validators import ASCIIUsernameValidator
@@ -210,3 +211,59 @@ class DepartmentHead(models.Model):
 
     def __str__(self):
         return "{}".format(self.user)
+
+class RegistrationRequest(models.Model):
+
+    ROLE_CHOICES = (
+        ("student", "Student"),
+        ("lecturer", "Lecturer"),
+    )
+
+    STATUS_CHOICES = (
+        ("PENDING_EMAIL", "Pending Email Verification"),
+        ("PENDING_REVIEW", "Pending Review"),
+        ("APPROVED", "Approved"),
+        ("REJECTED", "Rejected"),
+    )
+
+    first_name = models.CharField(max_length=30)
+
+    last_name = models.CharField(max_length=30)
+
+    email = models.EmailField(unique=True)
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+    )
+
+    email_verified = models.BooleanField(
+        default=False,
+    )
+
+    verification_token = models.UUIDField(
+        default=uuid4,
+        editable=False,
+        unique=True,
+    )
+
+    status = models.CharField(
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default="PENDING_EMAIL",
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    reviewed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self):
+        return (
+            f"{self.first_name} {self.last_name} "
+            f"({self.role}) - {self.status}"
+        )

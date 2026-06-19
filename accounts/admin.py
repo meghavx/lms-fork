@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Student, Parent
+from .models import User, Student, Parent, RegistrationRequest
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -33,3 +33,31 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(Student)
 admin.site.register(Parent)
+
+class RegistrationRequestAdmin(admin.ModelAdmin):
+    list_display = (
+        "first_name",
+        "last_name",
+        "email",
+        "role",
+        "status",
+        "email_verified",
+        "created_at",
+    )
+
+    list_filter = (
+        "role",
+        "status",
+        "email_verified",
+    )
+
+    search_fields = (
+        "first_name",
+        "last_name",
+        "email",
+    )
+
+admin.site.register(
+    RegistrationRequest,
+    RegistrationRequestAdmin,
+)
